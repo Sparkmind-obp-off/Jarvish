@@ -1,0 +1,19 @@
+name = "jarvish"
+main = "worker/index.ts"
+compatibility_date = "2026-10-06"
+
+[vars]
+JARVISH_ENV = "production"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "jarvish"
+database_id = "REPLACE_ME"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "REPLACE_ME"
+
+[[r2_buckets]]
+binding = "ARTIFACTS"
+bucket_name = "jarvish-artifacts"
