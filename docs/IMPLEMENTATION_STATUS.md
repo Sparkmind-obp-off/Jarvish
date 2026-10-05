@@ -12,15 +12,22 @@ Hono Pages Worker + Vite client; independent typed core; real Groq HTTP adapter 
 - `npm audit`: **0 vulnerabilities** at validation time.
 - `npm run test:e2e`: **16 browser/integration checks passed** against real Wrangler local D1. Owner login, memory approval/write/read-back, persistence on reload, anti-replay, real `https://example.com` read and verified evidence, backend provider-unavailable failure, controlled loading/success frontend fixtures, microphone denial, approved deletion of local test memory, mobile layout and absence of uncaught JS errors.
 - Fixed a real Workers compatibility issue discovered by the external-read test: redirect `error` is unsupported; manual redirect mode + explicit non-2xx rejection now prevents redirect traversal.
-- Late tool results cannot turn a timed-out FAILED execution into a claimed verified success; regression-tested.
+- Late tool results cannot turn a timed-out FAILED execution into a claimed verified success; regression-tested. Attempts and failure codes are persisted separately from verified evidence, so unsuccessful verification does not erase the attempted external result.
 
 Live Groq response, physical voice/audio output and real GitHub branch creation are **not** claimed by fixture tests.
 
 ## DEPLOYMENT
 
-Dedicated Cloudflare BYOK Pages project `jarvish` exists; assigned production domain: https://jarvish-apv.pages.dev. Code deployment and production URL verification are pending the current deployment pass.
+Code commit **729ba62** was successfully pushed to `Sparkmind-obp-off/Jarvish` `main` and actually deployed to the user's Cloudflare BYOK Pages project `jarvish`.
 
-Production D1 is not activated. Cloudflare rejected `jarvish-production` creation with: “You have reached the maximum number of D1 databases for your account.” No other database was deleted/reused. Root `wrangler.jsonc` intentionally has no fictitious D1 ID. `/health` must be 503 and storage-dependent operations must remain disabled until activation.
+- Production: **https://jarvish-apv.pages.dev**
+- Immutable deployment: https://f1dbf70f.jarvish-apv.pages.dev
+- Six production checks passed: shell HTTP 200 + CSP, CSS HTTP 200, honest D1 readiness 503, private API fail-closed, login reports missing D1, cross-origin write denied 403.
+- Production `secret list` returned no configured secret names. Groq and owner authentication are not activated.
+- Reproducible safe-degraded check: `EXPECT_DEGRADED=1 node tests/production.mjs`. Without that flag the same script requires healthy storage and fails until activation; this is not an operational-readiness claim.
+- GitHub App rejected automatic workflow creation because it lacks `workflows` permission. CI is an inactive `tests/ci-workflow.example.yml` template, not a running workflow. The implementation itself was pushed without force and without widening authorization.
+
+Production deployment is **DEGRADED, NOT OPERATIONAL**. D1 is not activated. Cloudflare rejected `jarvish-production` creation with: “You have reached the maximum number of D1 databases for your account.” No other database was deleted/reused. Root `wrangler.jsonc` intentionally has no fictitious D1 ID. `/health` must be 503 and storage-dependent operations must remain disabled until activation.
 
 ## BLOCKED / NOT OPERATIONAL
 

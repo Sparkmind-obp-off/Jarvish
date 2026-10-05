@@ -17,7 +17,7 @@ No runtime dependency on Genspark, HOLBERY or Bozq One System.
 
 ## Honest deployment status — 2026-10-05
 
-The dedicated Pages project is `jarvish`, with assigned domain **https://jarvish-apv.pages.dev**. Source deployment/verification is recorded in `docs/IMPLEMENTATION_STATUS.md`.
+Code commit **729ba62** was pushed to GitHub main and actually deployed through Cloudflare BYOK. Production: **https://jarvish-apv.pages.dev** (Pages project `jarvish`); immutable deployment: https://f1dbf70f.jarvish-apv.pages.dev. Six production infrastructure/security checks passed. This is a **degraded code deployment, not an operational AI runtime**. Evidence is recorded in `docs/IMPLEMENTATION_STATUS.md`.
 
 **Production runtime activation is blocked:** Cloudflare refused creation of `jarvish-production` because the account has reached its D1 database limit. Other projects' databases have not been deleted or reused. Production configuration contains no fabricated database ID. Storage-dependent operations fail closed; `/health` returns 503 until D1 is bound and migrated.
 
@@ -52,6 +52,8 @@ npm run build
 npm audit
 npx playwright install --with-deps chromium
 npm run test:e2e # requires running Wrangler + local .dev.vars; uses local test memory only
+EXPECT_DEGRADED=1 node tests/production.mjs # verifies current safe-degraded production, NOT readiness
+# After activation: node tests/production.mjs (requires healthy production D1)
 ```
 
 46 automated tests and 16 browser/integration checks passed at the recorded implementation run. The browser suite explicitly labels its mocked successful LLM response; it also tests the real missing-provider failure. Physical microphone/STT/TTS output needs user-device validation.
