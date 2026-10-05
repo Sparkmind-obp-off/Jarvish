@@ -1,70 +1,21 @@
-# Jarvish Roadmap
+# Jarvish maturity — evidence-based
 
-## Phase 0 — Foundation
-- repository and package structure
-- provider contracts
-- tool contracts
-- permission model
-- Cloudflare skeleton
-- test baseline
+This is a status map, not a replacement for implementation.
 
-## Phase 1 — Voice
-- microphone input
-- VAD
-- local STT
-- LLM response
-- local TTS
-- end-to-end talk loop
+| Stage | Implemented now | Activation or remaining work |
+|---|---|---|
+| V0 TALK | Browser mic/STT adapter, Groq adapter, authenticated core/API, browser TTS, error states | Live Groq secret and physical user-device voice round trip; local Whisper/Piper not active |
+| V1 MEMORY | Typed D1 facts, relevance retrieval, chronological session history, explicit approval/write/read-back | Dedicated production D1 blocked by account quota; Wrangler local D1 tested |
+| V2 SEE | Existing vision boundary preserved | No vision/OCR or screenshot-understanding provider; not claimed |
+| V3 ACT | Tool registry, GitHub inspect/branch, web read, memory write/search/delete, verification ledger | Real web read + memory verified locally; GitHub external writes need optional scoped runtime token and confirmation |
+| V4 AUTONOMY | Bounded plans (4 independent steps), gates, atomic claims, checkpoints and one read-only retry | No autonomous background queue, output chaining or uncontrolled loops; not full autonomy |
+| V5 OPERATOR | Owner workspace + persistent execution records | Activation + repeatable live user tasks required before operational claim |
+| V6 TRUE JARVISH | Objective retained | Not built/functional/operational as a complete system |
 
-## Phase 2 — Activation
-- wake word
-- persistent session
-- interruption / barge-in
-- conversation state
+## Immediate activation
 
-## Phase 3 — Memory
-- D1 schema
-- session memory
-- long-term memory policy
-- project/task memory
-- retrieval and write rules
+Make dedicated D1 quota available, run `node scripts/activate-d1.mjs`, set encrypted production owner/Groq secrets, redeploy, verify health + real chat + memory + tools + voice. Other projects remain technically and operationally separate. The D1 activation script never deletes/reuses their resources.
 
-## Phase 4 — Tools
-- web
-- GitHub
-- files
-- browser
-- shell
-- automation adapters
+## Subsequent engineering
 
-## Phase 5 — Execution
-- planning
-- tool execution
-- verification
-- evidence
-- reporting
-
-## Phase 6 — Resilience
-- local fallback
-- Cloudflare/edge fallback
-- free-provider fallback
-- paid-provider escalation
-- degraded/offline mode
-
-## Phase 7 — Autonomy
-- goal-based tasks
-- task queue
-- retries
-- checkpoints
-- approval gates
-
-## Phase 8 — Personal Operator
-- projects
-- daily tasks
-- research
-- coding workflows
-- automation
-- memory
-
-## Phase 9 — True Jarvish
-Voice + memory + vision + tools + execution + verification + autonomy, operating as a personal assistant/operator.
+Connect a separate authenticated local inference/STT/TTS runtime, add provider-independent vision, implement narrowly scoped calendar/email adapters, add explicit output chaining and interrupted-run investigation/recovery, and implement user-controlled retention/erasure. Each requires tests and real verification before a maturity claim. Shell/desktop control must run outside Workers through an explicitly secured execution agent, not Node processes embedded in the edge application.

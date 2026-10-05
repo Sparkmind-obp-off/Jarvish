@@ -1,0 +1,18 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "jarvish",
+  "pages_build_output_dir": "../dist",
+  "compatibility_date": "2026-10-01",
+  "vars": {
+    "JARVISH_ENV": "development",
+    "GROQ_MODEL": "llama-3.3-70b-versatile",
+    "GITHUB_REPOSITORIES": "Sparkmind-obp-off/Jarvish",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "jarvish-local",
+      "migrations_dir": "../database/migrations",
+    },
+  ],
+}

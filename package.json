@@ -1,10 +1,33 @@
 {
   "name": "jarvish",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "workspaces": ["core", "apps/web"],
+  "workspaces": [
+    "core",
+    "apps/web"
+  ],
   "scripts": {
-    "typecheck": "npm run typecheck --workspace @jarvish/core"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p apps/web/tsconfig.json",
+    "test": "vitest run",
+    "test:e2e": "node tests/e2e.mjs",
+    "build": "node scripts/build.mjs",
+    "dev:sandbox": "wrangler pages dev dist --ip 0.0.0.0 --port 3000 --d1 DB --persist-to cloudflare/.wrangler/state --binding JARVISH_ENV=development",
+    "db:local": "wrangler d1 migrations apply jarvish-local --local --config cloudflare/wrangler.jsonc",
+    "db:remote": "wrangler d1 migrations apply jarvish-production --remote",
+    "deploy": "npm run typecheck && npm test && npm run build && wrangler pages deploy dist --project-name jarvish --branch main"
+  },
+  "dependencies": {
+    "hono": "^4.12.0",
+    "zod": "^4.3.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261005.1",
+    "@playwright/test": "^1.58.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.9.0",
+    "vite": "^7.0.0",
+    "vitest": "^5.0.3",
+    "wrangler": "^4.134.0"
   }
 }

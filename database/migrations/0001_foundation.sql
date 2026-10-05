@@ -51,15 +51,4 @@ CREATE TABLE IF NOT EXISTS execution_evidence (
   kind TEXT NOT NULL,
   content TEXT NOT NULL,
   created_at TEXT NOT NULL
-);ALTER TABLE executions ADD COLUMN status TEXT NOT NULL DEFAULT 'READY';
-ALTER TABLE executions ADD COLUMN plan_json TEXT NOT NULL DEFAULT '[]';
-ALTER TABLE executions ADD COLUMN checkpoint INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE executions ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE executions ADD COLUMN updated_at TEXT;
-ALTER TABLE executions ADD COLUMN error_code TEXT;
-ALTER TABLE executions ADD COLUMN approval_at TEXT;
-CREATE INDEX IF NOT EXISTS memories_kind ON memories(kind,importance);
-CREATE INDEX IF NOT EXISTS messages_session ON messages(session_id,created_at);
-CREATE INDEX IF NOT EXISTS evidence_execution ON execution_evidence(execution_id);
-CREATE TABLE IF NOT EXISTS auth_sessions(token_hash TEXT PRIMARY KEY,expires_at INTEGER NOT NULL);
-CREATE TABLE IF NOT EXISTS rate_limits(bucket TEXT PRIMARY KEY,hits INTEGER NOT NULL,expires_at INTEGER NOT NULL);
+);

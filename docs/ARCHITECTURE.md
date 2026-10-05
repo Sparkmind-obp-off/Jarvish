@@ -1,70 +1,42 @@
-# Jarvish Architecture
+# Jarvish Architecture — implemented runtime
 
-## System loop
+## Runtime loop
 
-VOICE INPUT
-→ UNDERSTAND
-→ MEMORY / CONTEXT
-→ REASON / PLAN
-→ TOOL SELECTION
-→ EXECUTE
-→ VERIFY
-→ REMEMBER
-→ VOICE OUTPUT
+Browser microphone → Web Speech recognition → authenticated Hono `/api/chat` → D1 retrieval/history → provider-neutral JarvishEngine → ProviderRouter → Groq adapter → schema-validated reply/plan → explicit user execution/approval → ToolRegistry → ExecutionEngine → independent verification → D1 checkpoint/evidence → UI + browser TTS.
+
+Plans do not claim completed actions. Tool outputs are rendered directly as verified evidence, not invented by an LLM. Sessions and explicit facts remain in D1. No service simulates local models or external successes.
 
 ## Control plane
 
-Cloudflare Pages hosts the web client.
-Cloudflare Workers expose the API/orchestration boundary.
-Durable Objects manage realtime sessions and long-lived task state.
-D1 stores canonical structured memory and task metadata.
-KV is used for cache/short-lived state.
-R2 stores artifacts such as audio, documents, screenshots and execution evidence.
-Cloudflare AI Gateway can sit between Jarvish and external AI providers for routing, observability, caching and resilience.
-Workers AI is an optional edge inference fallback.
+- `apps/web`: TypeScript/Vite client with conversation, memory, execution and status panels.
+- `cloudflare/worker/index.ts`: Hono Pages advanced-mode Worker; authentication, validation, API, structured logs.
+- `core/src`: interfaces, permission primitive, sequential fallback routing, bounded JSON planner.
+- `providers/groq`: server-side Groq HTTP/timeout/error translation; credentials are Worker secrets.
+- `providers/local`: explicitly unavailable until a real separate local inference runtime exists.
+- `memory/src`: typed facts and bounded relevance/history queries with parameterized SQL.
+- `tools/src`: validated tool registration, schemas, permissions, timeouts, handlers and verifiers.
+- `execution/src`: durable state machine and verified checkpoints; atomic D1 update claims.
+- `voice/src/browser.ts`: browser STT/TTS; microphone tracks are released after permission testing.
+- `database/migrations`: original foundation retained as migration 0001, additive runtime migration 0002.
 
-## Provider abstraction
+Production uses dedicated D1. There are no deployed KV/R2/Durable Object/cron services. R2 is appropriate for future binary artifacts, not currently needed. No memory or persistent execution state is kept in Worker memory/files. There is no Node runtime dependency in the bundled Worker; Node is used only by development/build/test/activation scripts.
 
-The Jarvish core must never assume one model vendor.
+## Provider contract
 
-LLMProvider:
-- local: Ollama / llama.cpp
-- cloud/free-tier: Gemini / Groq / OpenRouter / Hugging Face
-- premium optional: OpenAI / Anthropic / other compatible providers
+`id`, `name`, `capabilities`, `health()`, `generate(request)` → normalized content/provider/model or RuntimeError. Health is a configuration check, not a live inference probe. Groq-specific JSON exists only in its adapter. Additional providers can implement the same interface. Router fallback and malformed-response handling are tested; default API uses Groq only, so it cannot promise live fallback inference.
 
-VoiceProvider:
-- local STT: whisper.cpp
-- local TTS: Piper / Kokoro
-- optional cloud STT/TTS adapters
+Memory/history are marked as untrusted user data, not additional system instructions. Maximum 10 memories and 10 recent history messages are supplied. Plans contain at most four independently valid steps, without output-variable interpolation or uncontrolled loops.
 
-## Execution policy
+## Execution states
 
-LEVEL 0 READ
-- inspect files
-- inspect projects
-- web research
-- status
+`UNDERSTAND/PLAN` occur in the core before durable plan creation.
 
-LEVEL 1 SAFE WRITE
-- create drafts
-- save notes
-- save memory
-- create branches
+`READY` (read-only) or `AWAITING_APPROVAL` (write) → explicit approval → atomic claim → `RUNNING` → `VERIFYING` → checkpoint + evidence → `COMPLETE` or `FAILED`.
 
-LEVEL 2 EXTERNAL ACTION
-- send
-- publish
-- merge
-- deploy
+Every write, including level 1, requires approval (stricter than the minimum). GitHub branch creation is conservatively level 2 because it changes an external repository. Memory deletion is level 3. Approval applies to the stored immutable plan; the approval request cannot replace inputs. Duplicate/concurrent runs are refused. Failed read-only plans can retry once from their last verified checkpoint. Writes never replay automatically, including after ambiguous timeouts. A worker interrupted during RUNNING/VERIFYING requires manual investigation; this build does not automatically recover potentially side-effecting interrupted work.
 
-LEVEL 3 DESTRUCTIVE
-- delete
-- revoke
-- production overwrite
-- financial action
+GitHub branch creation verifies the exact returned SHA with a separate GET ref. Memory writes verify by reading the stored row. Web reads use successful response + nonempty content as sufficient evidence for a read. HTTPS host/repository allowlists constrain network scope; redirects are manual and non-2xx responses are rejected.
 
-Level 2 and Level 3 actions require confirmation by default.
+## Current infrastructure limitation
 
-## Independence
-
-Jarvish has no runtime dependency on HOLBERY. Integration, if ever needed, must happen through explicit APIs/adapters.
+Cloudflare D1 creation was rejected at the account database-count limit. No other project's database is reused. Production remains safely degraded without a DB binding; deployment of code alone is not operational readiness. The activation script attaches only a real Cloudflare-returned Jarvish UUID when account quota becomes available.

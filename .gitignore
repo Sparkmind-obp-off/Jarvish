@@ -7,3 +7,10 @@ build/
 .wrangler/
 .DS_Store
 *.log
+.dev.vars
+.dev.vars.*
+secrets/
+.playwright/
+test-results/
+playwright-report/
+*.tar.gz

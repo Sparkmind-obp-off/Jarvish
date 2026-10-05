@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "jarvish",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-10-01",
+  "vars": {
+    "JARVISH_ENV": "production",
+    "GROQ_MODEL": "llama-3.3-70b-versatile",
+    "GITHUB_REPOSITORIES": "Sparkmind-obp-off/Jarvish",
+  },
+  // No fabricated D1 ID: activation script inserts the real binding after quota is available.
+}

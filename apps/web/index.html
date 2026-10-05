@@ -1,17 +1,260 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Jarvish</title>
-</head>
-<body>
-  <main id="app">
-    <h1>Jarvish</h1>
-    <p>Personal AI Operator</p>
-    <button id="talk">Start voice</button>
-    <p id="status">Ready</p>
-  </main>
-  <script type="module" src="/src/main.ts"></script>
-</body>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101416" />
+    <meta
+      name="description"
+      content="Jarvish — independent personal AI operator with structured memory and verified actions."
+    />
+    <title>Jarvish — Personal AI Operator</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <aside id="sidebar">
+      <a class="brand" href="/" aria-label="Jarvish home"
+        ><span class="brand-mark">J<span></span></span>JARVISH</a
+      >
+      <p class="eyebrow">PERSONAL CONTROL PLANE</p>
+      <nav aria-label="Workspace">
+        <button class="nav-item active" data-tab="conversation">
+          ◉ <span>Conversation</span></button
+        ><button class="nav-item" data-tab="memory">
+          ▤ <span>Memory</span></button
+        ><button class="nav-item" data-tab="executions">
+          ↗ <span>Executions</span></button
+        ><button class="nav-item" data-tab="system">
+          ⊞ <span>System</span>
+        </button>
+      </nav>
+      <section class="sidebar-foot">
+        <span class="live-dot"></span> Independent by design
+        <p>YOUR CONTEXT. YOUR CONTROL.</p>
+        <button id="logout" class="text-button" hidden>Lock workspace</button>
+      </section>
+    </aside>
+    <main id="workspace">
+      <header class="topbar">
+        <span
+          >Workspace <span class="slash">/</span>
+          <strong id="page-title">Conversation</strong></span
+        ><span class="version">RUNTIME <span>v0.2</span></span>
+      </header>
+      <section id="login-panel" class="login-panel">
+        <p class="eyebrow">PRIVATE WORKSPACE</p>
+        <h1>Your operator.<br />Your control.</h1>
+        <p>
+          Unlock Jarvish with your owner access key. Your AI provider
+          credentials never enter this browser.
+        </p>
+        <form id="login-form">
+          <label for="owner-key">Owner access key</label
+          ><input
+            id="owner-key"
+            type="password"
+            autocomplete="current-password"
+            required
+            minlength="20"
+            placeholder="Enter your private access key"
+          /><button class="primary" type="submit">
+            Unlock workspace <span>→</span>
+          </button>
+        </form>
+        <p id="login-error" role="alert"></p>
+      </section>
+      <section id="runtime" hidden>
+        <section id="conversation-panel" class="tab-panel">
+          <header class="section-header">
+            <section>
+              <p class="eyebrow">VOICE-FIRST. ACTION-READY.</p>
+              <h1>Good to have you here.</h1>
+              <p>Think out loud. Let’s turn intent into verified work.</p>
+            </section>
+            <span class="badge" id="connection">CONNECTING</span>
+          </header>
+          <section class="operator-card" aria-label="Voice control">
+            <section>
+              <span class="eyebrow">JARVISH IS</span>
+              <h2 id="status" role="status" aria-live="polite">IDLE</h2>
+              <p id="status-detail">Ready for your next thought.</p>
+              <span class="privacy-note"
+                >Browser voice · explicit approvals · verified results</span
+              >
+            </section>
+            <button
+              id="talk"
+              class="mic-button"
+              aria-label="Start or stop microphone"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="9" y="2" width="6" height="13" rx="3"></rect>
+                <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"></path>
+              </svg>
+            </button>
+          </section>
+          <section class="quick-actions" aria-label="Quick actions">
+            <button id="inspect-repo">↗ Inspect Jarvish repository</button
+            ><button id="open-memory">▤ Open structured memory</button
+            ><button id="new-session">＋ New conversation</button>
+          </section>
+          <section
+            id="messages"
+            class="messages"
+            aria-label="Conversation"
+            aria-live="polite"
+          >
+            <article class="welcome">
+              <span class="eyebrow">A CLEAR START</span>
+              <p>
+                Ask a question, save something worth remembering, or give me a
+                bounded task.
+              </p>
+              <small
+                >I’ll show the plan before acting. No silent external
+                changes.</small
+              >
+            </article>
+          </section>
+          <form id="chat-form" class="composer">
+            <label class="sr-only" for="chat-input">Message Jarvish</label
+            ><textarea
+              id="chat-input"
+              rows="2"
+              maxlength="8000"
+              placeholder="What are we working on?"
+              required
+            ></textarea>
+            <footer>
+              <span>Text or voice. Always your decision.</span
+              ><button id="send" class="primary" type="submit">
+                Send <span>↑</span>
+              </button>
+            </footer>
+          </form>
+          <section class="voice-options">
+            <label for="voice-language">Voice language</label
+            ><select id="voice-language">
+              <option value="id-ID">Bahasa Indonesia</option>
+              <option value="en-US">English</option></select
+            ><label
+              ><input id="speak-replies" type="checkbox" checked /> Speak
+              replies</label
+            ><button id="stop-voice" class="text-button">Stop voice</button>
+          </section>
+          <p class="disclosure">
+            Speech recognition depends on your browser and may use its vendor’s
+            cloud. Whisper/Piper local runtime is not connected.
+          </p>
+        </section>
+        <section id="memory-panel" class="tab-panel" hidden>
+          <header class="section-header">
+            <section>
+              <p class="eyebrow">CONTEXT THAT LASTS</p>
+              <h1>Structured memory</h1>
+              <p>
+                Explicit facts, not an unstructured prompt. Stored in your D1
+                database.
+              </p>
+            </section>
+            <button class="secondary" id="refresh-memory">Refresh</button>
+          </header>
+          <form id="memory-form" class="form-card">
+            <h2>Remember something</h2>
+            <label for="memory-kind">Category</label
+            ><select id="memory-kind">
+              <option value="user">User fact</option>
+              <option value="preference">Preference</option>
+              <option value="project">Project</option>
+              <option value="task">Task</option>
+              <option value="experience">Experience</option>
+              <option value="session">Session context</option></select
+            ><label for="memory-content"
+              >Content — never passwords or API keys</label
+            ><textarea
+              id="memory-content"
+              maxlength="2000"
+              required
+              rows="3"
+              placeholder="A fact or preference worth keeping"
+            ></textarea
+            ><button class="primary" type="submit">
+              Create approval plan →
+            </button>
+          </form>
+          <section
+            id="memory-list"
+            class="card-list"
+            aria-live="polite"
+          ></section>
+        </section>
+        <section id="executions-panel" class="tab-panel" hidden>
+          <header class="section-header">
+            <section>
+              <p class="eyebrow">EVIDENCE OVER ASSUMPTIONS</p>
+              <h1>Execution ledger</h1>
+              <p>
+                Immutable plans. Explicit approvals. Checkpoints and
+                verification.
+              </p>
+            </section>
+            <button class="secondary" id="refresh-executions">Refresh</button>
+          </header>
+          <form id="tool-form" class="form-card">
+            <h2>Run a supported tool</h2>
+            <label for="tool-select">Tool</label
+            ><select id="tool-select"></select
+            ><label for="tool-input">Input JSON</label
+            ><textarea
+              id="tool-input"
+              rows="4"
+              required
+              spellcheck="false"
+            ></textarea
+            ><button type="submit" class="primary">
+              Create execution plan →
+            </button>
+          </form>
+          <section
+            id="execution-list"
+            class="card-list"
+            aria-live="polite"
+          ></section>
+        </section>
+        <section id="system-panel" class="tab-panel" hidden>
+          <header class="section-header">
+            <section>
+              <p class="eyebrow">HONEST BY DEFAULT</p>
+              <h1>Runtime & capabilities</h1>
+              <p>
+                Configured is not the same as tested. Unavailable means
+                unavailable.
+              </p>
+            </section>
+          </header>
+          <section id="system-info" class="card-list"></section>
+          <article class="form-card">
+            <h2>Bounded operator, not uncontrolled autonomy</h2>
+            <p>
+              Plans are limited to four independent steps. Writes require
+              approval. Read-only failures can retry once from the last verified
+              checkpoint. Shell, desktop control, vision, calendar and email are
+              not implemented.
+            </p>
+            <p>
+              Groq secret: Cloudflare Pages → jarvish → Settings → Variables and
+              Secrets → <code>GROQ_API_KEY</code> (encrypted, Production), then
+              redeploy.
+            </p>
+          </article>
+        </section>
+      </section>
+      <p id="global-error" class="global-error" role="alert" hidden></p>
+      <footer class="workspace-footer">
+        <span>JARVISH / PERSONAL AI OPERATOR</span
+        ><span>Understand → Plan → Verify</span>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
