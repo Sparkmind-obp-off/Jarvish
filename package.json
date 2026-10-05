@@ -1,0 +1,10 @@
+{
+  "name": "jarvish",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["core", "apps/web"],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspace @jarvish/core"
+  }
+}
